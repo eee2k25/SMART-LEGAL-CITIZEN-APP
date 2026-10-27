@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}{{code}} | CivicLaw{% endblock %}{% block content %}<section class="pagehead"><span class="eyebrow">{{code}}</span><h1>{{message}}</h1><p>Return to the homepage or explore the public information library.</p><a class="btn primary" href="{% url 'home' %}">Go to homepage</a></section>{% endblock %}
