@@ -1,27 +1,32 @@
-databases:
+﻿databases:
   - name: civiclaws-db
     databaseName: civiclaws
     user: civiclaws_user
-    plan: basic-256mb
+    plan: free
     ipAllowList: []
+
 services:
   - type: web
-    name: smart-legal-citizen-support
+    name: smart-legal-citizen-support-ee2k25
     runtime: python
-    buildCommand: bash build.sh
+    plan: free
+    rootDir: .
+    buildCommand: python -m pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput && python manage.py seed_demo
     startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.16
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: smart-legal-citizen-support.onrender.com
+        value: smart-legal-citizen-support-ee2k25.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: civiclaws-db
           property: connectionString
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://smart-legal-citizen-support.onrender.com
+        value: https://smart-legal-citizen-support-ee2k25.onrender.com
       - key: EMAIL_BACKEND
         value: django.core.mail.backends.console.EmailBackend
