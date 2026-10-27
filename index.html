@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Smart Legal & Citizen Support Platform — project overview and live demo.">
+  <title>Smart Legal & Citizen Support Platform</title>
+  <style>
+    :root{--navy:#102942;--teal:#287e7b;--gold:#d9ad5b;--ink:#1d2d3c;--muted:#617184;--bg:#f4f7f8}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+    .wrap{max-width:1000px;margin:auto;padding:28px 20px 60px}
+    header{padding:20px 0 52px}nav{display:flex;justify-content:space-between;align-items:center;color:var(--navy);font-weight:750}
+    .brand{font-size:18px}.badge{font-size:12px;color:var(--teal);letter-spacing:1px;text-transform:uppercase}
+    .hero{background:var(--navy);color:white;border-radius:20px;padding:clamp(28px,6vw,64px)}
+    h1{font-size:clamp(36px,7vw,60px);line-height:1.08;letter-spacing:-1.5px;margin:12px 0 18px}
+    h1 span{color:var(--gold)}.hero p{max-width:700px;color:#d7e1e9;font-size:18px}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+    .btn{display:inline-block;border-radius:8px;padding:12px 18px;font-weight:750;text-decoration:none}
+    .primary{background:var(--gold);color:var(--navy)}.secondary{border:1px solid #8ca0b1;color:white}
+    section{margin-top:38px}h2{color:var(--navy);font-size:26px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:white;padding:22px;border-radius:12px;border:1px solid #dce3e8}
+    .card h3{margin:0 0 8px;color:var(--navy)}.card p{margin:0;color:var(--muted)}
+    .note{background:#fff8e9;border-left:4px solid var(--gold);padding:16px 18px;border-radius:8px}
+    a{color:var(--teal)}a:focus-visible,.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+    footer{margin-top:42px;color:var(--muted);font-size:13px;border-top:1px solid #dce3e8;padding-top:18px}
+    @media(max-width:540px){header{padding-bottom:28px}.actions{flex-direction:column}.btn{text-align:center}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header><nav><span class="brand">CivicLaw</span><span class="badge">Academic project</span></nav></header>
+    <main>
+      <div class="hero">
+        <div class="badge" style="color:#d9ad5b">SMART LEGAL &amp; CITIZEN SUPPORT</div>
+        <h1>Legal and public-service guidance, <span>made clearer.</span></h1>
+        <p>A responsive Django web application for exploring general legal information, searching an advocate directory, preparing complaint checklists, and discovering citizen services.</p>
+        <div class="actions">
+          <a class="btn primary" href="https://smart-legal-citizen-support-ee2k25.onrender.com/">Open live application →</a>
+          <a class="btn secondary" href="https://github.com/eee2k25/SMART-LEGAL-CITIZEN-APP">View source on GitHub</a>
+        </div>
+      </div>
+
+      <section>
+        <h2>What you can explore</h2>
+        <div class="grid">
+          <article class="card"><h3>Legal information</h3><p>Search general information with jurisdiction and source references.</p></article>
+          <article class="card"><h3>Advocate directory</h3><p>Try name, practice-area, and location filters using labelled demo profiles.</p></article>
+          <article class="card"><h3>Complaint preparation</h3><p>Review general steps and save checklist progress with an account.</p></article>
+          <article class="card"><h3>Citizen services</h3><p>Browse service information and continue to official websites.</p></article>
+          <article class="card"><h3>Information assistant</h3><p>Searches the platform library and points to matching articles; it is not generative AI.</p></article>
+          <article class="card"><h3>Built with</h3><p>Python, Django, Django Templates, SQLite locally, and PostgreSQL support for deployment.</p></article>
+        </div>
+      </section>
+
+      <section class="note">
+        <strong>Scope note:</strong> This is an academic demonstration, not a law firm or government service. Demo advocate profiles are fictional; the platform does not file complaints or contact lawyers. Legal content is general information, not legal advice.
+      </section>
+    </main>
+    <footer>
+      Project by eee2k25 · <a href="https://github.com/eee2k25/SMART-LEGAL-CITIZEN-APP">Source repository</a> ·
+      <a href="https://smart-legal-citizen-support-ee2k25.onrender.com/">Live Django app</a>
+    </footer>
+  </div>
+</body>
+</html>
