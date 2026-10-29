@@ -33,6 +33,47 @@ class PlatformTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Consumer guide")
 
+    def test_legal_search_matches_keywords_without_exact_phrase(self):
+        property_category = Category.objects.create(name="Property and land")
+        article = LegalArticle.objects.create(
+            title="Land records overview",
+            slug="land-records-overview",
+            summary="A general guide to checking records",
+            content="Verify current property requirements with official sources.",
+            category=property_category,
+            published=True,
+        )
+        response = self.client.get(reverse("legal_list"), {"q": "law property"})
+        self.assertContains(response, article.title)
+
+    def test_legal_search_matches_domestic_violence_words(self):
+        article = LegalArticle.objects.create(
+            title="Domestic violence: safety information",
+            slug="domestic-violence-safety",
+            summary="General information and verified support sources.",
+            content="This article is about domestic abuse and personal safety.",
+            category=self.cat,
+            published=True,
+        )
+        response = self.client.get(
+            reverse("legal_list"), {"q": "violence domestic"}
+        )
+        self.assertContains(response, article.title)
+
+    def test_advocate_search_uses_practice_area_keywords(self):
+        from .models import Advocate
+
+        Advocate.objects.create(
+            name="Verified Example Profile",
+            slug="verified-example-profile",
+            practice_areas="Property law and conveyancing",
+            city="Hyderabad",
+            region="Telangana",
+            is_public=True,
+        )
+        response = self.client.get(reverse("advocates"), {"q": "law property"})
+        self.assertContains(response, "Verified Example Profile")
+
     def test_draft_not_public(self):
         draft = LegalArticle.objects.create(
             title="Secret draft",

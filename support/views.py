@@ -17,6 +17,36 @@ from .models import (
 )
 
 
+# Search every meaningful word in a query independently, without requiring the
+# exact phrase/order. Generic words such as "law" do not drown out the topic.
+_SEARCH_STOP_WORDS = {
+    "a", "an", "and", "are", "as", "at", "about", "by", "can", "do",
+    "does", "for", "from", "how", "i", "in", "is", "it", "me", "of",
+    "on", "or", "the", "to", "what", "when", "where", "which", "who",
+    "why", "with", "law", "laws", "legal", "act", "acts", "information",
+    "please", "find", "search", "show", "need", "want", "my", "your",
+}
+
+
+def _search_terms(query):
+    """Return useful Unicode word tokens; keep the original if all are generic."""
+    import re
+
+    words = list(dict.fromkeys(re.findall(r"[\w]+", query.casefold(), flags=re.UNICODE)))
+    useful = [word for word in words if len(word) > 1 and word not in _SEARCH_STOP_WORDS]
+    return useful or words or [query.casefold()]
+
+
+def _keyword_search(queryset, query, fields):
+    """Match any query keyword against any configured field."""
+    terms = _search_terms(query)
+    matches = Q()
+    for term in terms:
+        for field in fields:
+            matches |= Q(**{f"{field}__icontains": term})
+    return queryset.filter(matches).distinct()
+
+
 def home(request):
     return render(
         request,
@@ -41,8 +71,13 @@ def legal_list(request):
     jurisdiction = request.GET.get("jurisdiction", "").strip()[:100]
     qs = LegalArticle.objects.filter(published=True).select_related("category")
     if q:
-        qs = qs.filter(
-            Q(title__icontains=q) | Q(summary__icontains=q) | Q(content__icontains=q)
+        qs = _keyword_search(
+            qs,
+            q,
+            [
+                "title", "summary", "content", "category__name",
+                "source_title", "jurisdiction", "language",
+            ],
         )
     if category:
         qs = qs.filter(category__slug=category)
@@ -113,8 +148,8 @@ def advocate_list(request):
     verified = request.GET.get("verified", "")
     qs = Advocate.objects.filter(is_public=True)
     if q:
-        qs = qs.filter(
-            Q(name__icontains=q) | Q(practice_areas__icontains=q) | Q(bio__icontains=q)
+        qs = _keyword_search(
+            qs, q, ["name", "practice_areas", "bio", "city", "region"]
         )
     if city:
         qs = qs.filter(Q(city__icontains=city) | Q(region__icontains=city))
@@ -144,8 +179,8 @@ def guide_list(request):
     q = request.GET.get("q", "").strip()[:100]
     qs = ComplaintGuide.objects.filter(published=True)
     if q:
-        qs = qs.filter(
-            Q(title__icontains=q) | Q(category__icontains=q) | Q(summary__icontains=q)
+        qs = _keyword_search(
+            qs, q, ["title", "category", "summary", "steps", "checklist"]
         )
     return render(
         request,
@@ -193,10 +228,10 @@ def services(request):
     category = request.GET.get("category", "").strip()[:80]
     qs = CitizenService.objects.filter(published=True)
     if q:
-        qs = qs.filter(
-            Q(name__icontains=q)
-            | Q(description__icontains=q)
-            | Q(department__icontains=q)
+        qs = _keyword_search(
+            qs,
+            q,
+            ["name", "description", "department", "category", "jurisdiction"],
         )
     if category:
         qs = qs.filter(category__icontains=category)
@@ -323,16 +358,17 @@ def assistant(request):
         if len(query) < 4:
             answer = "Please enter a little more detail so I can search the reviewed information."
         else:
-            terms = [w for w in query.lower().split() if len(w) > 3][:8]
-            qs = LegalArticle.objects.filter(published=True)
-            match = Q()
-            for term in terms:
-                match |= (
-                    Q(title__icontains=term)
-                    | Q(summary__icontains=term)
-                    | Q(content__icontains=term)
-                )
-            results = list(qs.filter(match).distinct()[:4]) if terms else []
+            qs = LegalArticle.objects.filter(published=True).select_related("category")
+            results = list(
+                _keyword_search(
+                    qs,
+                    query,
+                    [
+                        "title", "summary", "content", "category__name",
+                        "source_title", "jurisdiction", "language",
+                    ],
+                )[:4]
+            )
             answer = (
                 "I found the following reviewed information that may be relevant. Please check its jurisdiction and source. This is general information, not legal advice."
                 if results
