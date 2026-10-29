@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.management import call_command
 from django.test import override_settings
 from .models import (
     Category,
@@ -73,6 +74,17 @@ class PlatformTests(TestCase):
         )
         response = self.client.get(reverse("advocates"), {"q": "law property"})
         self.assertContains(response, "Verified Example Profile")
+
+    def test_seeded_slugs_fit_database_field_limit(self):
+        call_command("seed_demo")
+        seed_titles = [
+            "Cyber law in India: online offences and reporting",
+            "Property and land transactions: an India and Telangana starting point",
+            "Domestic violence: the central law and support options",
+        ]
+        seeded = LegalArticle.objects.filter(title__in=seed_titles)
+        self.assertEqual(seeded.count(), 3)
+        self.assertTrue(all(len(slug) <= 50 for slug in seeded.values_list("slug", flat=True)))
 
     def test_draft_not_public(self):
         draft = LegalArticle.objects.create(

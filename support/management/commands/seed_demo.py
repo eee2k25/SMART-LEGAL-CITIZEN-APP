@@ -9,6 +9,11 @@ from support.models import (
 )
 
 
+def content_slug(value):
+    """Generate a deterministic slug within Django SlugField's 50-char limit."""
+    return slugify(value)[:50].rstrip("-")
+
+
 class Command(BaseCommand):
     help = "Load clearly-labelled, repeatable demonstration content (does not create an administrator)."
 
@@ -83,7 +88,7 @@ class Command(BaseCommand):
         ]
         for title, cat, summary, content, source, url in articles:
             LegalArticle.objects.update_or_create(
-                slug=slugify(title),
+                slug=content_slug(title),
                 defaults={
                     "title": title,
                     "category": categories[cat],
@@ -120,7 +125,7 @@ class Command(BaseCommand):
         ]
         for title, cat, summary, steps, checks, portal, source, sourceurl in guides:
             ComplaintGuide.objects.update_or_create(
-                slug=slugify(title),
+                slug=content_slug(title),
                 defaults={
                     "title": title,
                     "category": cat,
@@ -173,7 +178,7 @@ class Command(BaseCommand):
         ]
         for name, cat, dept, desc, jur, url, source in services:
             CitizenService.objects.update_or_create(
-                slug=slugify(name),
+                slug=content_slug(name),
                 defaults={
                     "name": name,
                     "category": cat,
@@ -194,7 +199,7 @@ class Command(BaseCommand):
             ),
         ]:
             Advocate.objects.update_or_create(
-                slug=slugify(name),
+                slug=content_slug(name),
                 defaults={
                     "name": name,
                     "practice_areas": area,
